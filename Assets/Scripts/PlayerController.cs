@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("インタラクト設定")]
+    [SerializeField] private float interactRange = 3f; // 触れる距離
+    [SerializeField] private LayerMask interactLayer;   // 反応するレイヤー（後で設定）
+
     [Header("移動速度設定")]
     [SerializeField] private float moveSpeed = 5f;
 
@@ -35,6 +39,7 @@ public class PlayerController : MonoBehaviour
         if (GameManager.Instance.CurrentMode == CameraMode.FPS)
         {
             HandleFPSRotation(); // FPS時はマウスで首振り
+            HandleFPSInteract(); // 毎フレーム正面に触れるものがないか監視
         }
         else if (GameManager.Instance.CurrentMode == CameraMode.TopDown)
         {
@@ -158,4 +163,34 @@ public class PlayerController : MonoBehaviour
             verticalRotation = 0f;
         }
     }
+
+    /// <summary>
+    /// FPSモード時の視線によるインタラクト処理
+    /// </summary>
+    private void HandleFPSInteract()
+    {
+        // 画面中央（カメラの正面）から前方に光線を飛ばす
+        Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, interactRange))
+        {
+            // 当たったオブジェクトが「IInteractable」の窓口を持っているか確認
+            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+
+            if (interactable != null)
+            {
+                // 画面下のデバッグログに、オブジェクトの説明テキストを表示してみる
+                // (将来的にこれをUIのテキストに表示させます)
+                Debug.Log($"注視中: {interactable.GetInteractText()} (Eキーで実行)");
+
+                // Eキーが押されたら、相手が何であるか気にせず「起動スイッチ」を押す！
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    interactable.Interact(this);
+                }
+            }
+        }
+    }
 }
+
