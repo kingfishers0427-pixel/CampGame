@@ -1,10 +1,14 @@
 using UnityEngine;
+using UnityEngine.UI; // UnityのUI機能を使うための宣言
 
 public class PlayerController : MonoBehaviour
 {
     [Header("インタラクト設定")]
     [SerializeField] private float interactRange = 3f; // 触れる距離
     [SerializeField] private LayerMask interactLayer;   // 反応するレイヤー（後で設定）
+
+    [Header("UI設定")]
+    [SerializeField] private Text interactTextUI; // 画面に表示するTextコンポーネント
 
     [Header("移動速度設定")]
     [SerializeField] private float moveSpeed = 5f;
@@ -165,13 +169,16 @@ public class PlayerController : MonoBehaviour
     }
 
     /// <summary>
-    /// FPSモード時の視線によるインタラクト処理
+    /// FPSモード時の視線によるインタラクト処理（UI連動版）
     /// </summary>
     private void HandleFPSInteract()
     {
         // 画面中央（カメラの正面）から前方に光線を飛ばす
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         RaycastHit hit;
+
+        // レイキャストが何かに当たったか、かつ当たったものがIInteractableを持っているか判定するフラグ
+        bool isLookingAtInteractable = false;
 
         if (Physics.Raycast(ray, out hit, interactRange))
         {
@@ -180,17 +187,28 @@ public class PlayerController : MonoBehaviour
 
             if (interactable != null)
             {
-                // 画面下のデバッグログに、オブジェクトの説明テキストを表示してみる
-                // (将来的にこれをUIのテキストに表示させます)
-                Debug.Log($"注視中: {interactable.GetInteractText()} (Eキーで実行)");
+                isLookingAtInteractable = true;
 
-                // Eキーが押されたら、相手が何であるか気にせず「起動スイッチ」を押す！
+                // 【強化】UIテキストに「[E] テントを設営する」のように綺麗に表示させる
+                if (interactTextUI != null)
+                {
+                    interactTextUI.text = $"[E] {interactable.GetInteractText()}";
+                }
+
+                // Eキーが押されたら実行
                 if (Input.GetKeyDown(KeyCode.E))
                 {
                     interactable.Interact(this);
                 }
             }
         }
+
+        // 何も見ていない、または触れないオブジェクトを見ている時はテキストを消す
+        if (!isLookingAtInteractable && interactTextUI != null)
+        {
+            interactTextUI.text = ""; // 空文字にして非表示にする
+        }
     }
+
 }
 
