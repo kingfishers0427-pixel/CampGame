@@ -9,6 +9,7 @@ public class ItemData : ScriptableObject
     [Header("アイテムの基本情報")]
     public string itemName;            // アイテムのゲーム内表示名
     public Sprite itemIcon;            // インベントリ用のアイコン画像（仮オブジェクト時は空でOK）
+    public GameObject itemPrefab;
     
     [Multiline(3)]
     public string itemDescription;     // アイテムの簡単な説明文

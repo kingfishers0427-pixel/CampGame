@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe9a2e86c2ef934baa11240e64b7f49, type: 3}
   m_Name: Item_Firewood
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: 
+  itemName: "\u85AA"
   itemIcon: {fileID: 0}
-  itemDescription: 
+  itemDescription: "\u65A7\u3067\u5272\u3063\u305F\u4E7E\u71E5\u3057\u305F\u85AA\u3002\u711A\u304D\u706B\u306B\u304F\u3079\u308B\u3068\u706B\u304C\u9577\u6301\u3061\u3059\u308B"
   odorRadius: 0
   isEdible: 0
-  isFuel: 0
+  isFuel: 1

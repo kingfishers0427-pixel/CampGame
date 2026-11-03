@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe9a2e86c2ef934baa11240e64b7f49, type: 3}
   m_Name: Item_RainbowTrout
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: 
+  itemName: "\u30CB\u30B8\u30DE\u30B9"
   itemIcon: {fileID: 0}
-  itemDescription: 
-  odorRadius: 0
-  isEdible: 0
+  itemDescription: "\u5DDD\u3067\u91E3\u3063\u305F\u65B0\u9BAE\u306A\u9B5A\u3002\u634C\u3044\u3066\u304B\u3089\u713C\u304F\u5FC5\u8981\u304C\u3042\u308B\u3002"
+  odorRadius: 8
+  isEdible: 1
   isFuel: 0
