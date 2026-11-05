@@ -2,50 +2,99 @@ using UnityEngine;
 
 public class ItemPlacer : MonoBehaviour
 {
-    [Header("設置したいアイテムのデータ")]
-    public ItemData itemToPlace; // ここにItem_Lanternを入れます
+    [Header("現在の手持ちアイテムデータ（空でもOK）")]
+    public ItemData holdingItem; 
 
-    [Header("プレイヤーのカメラ（目の前の計算用）")]
+    [Header("プレイヤーのカメラ（レティクルの中心用）")]
     public Transform playerCamera; 
 
-    [Header("プレイヤーからどれくらい離れた場所に置くか")]
-    public float placeDistance = 2.0f;
+    [Header("距離の設定")]
+    public float placeDistance = 3.0f;
+    public float pickupDistance = 3.0f;
+
+    [Header("追加：アイテム固有のプレハブが無い場合に使う汎用プレハブ")]
+    public GameObject defaultItemPrefab; // ★ここに先ほど作ったTest_PickupableItemなどを入れます
+
+    void Start()
+    {
+        if (playerCamera == null && Camera.main != null)
+        {
+            playerCamera = Camera.main.transform;
+        }
+    }
 
     void Update()
     {
-        // キーボードの「Gキー」を押したら設置する（キーはお好みで変更できます）
-        if (Input.GetKeyDown(KeyCode.G))
+        // 【Gキー】手持ちがあり、レティクルが有効な位置にあれば設置
+        if (Input.GetKeyDown(KeyCode.G) && holdingItem != null)
         {
             PlaceItem();
+        }
+
+        // 【Eキー】目の前のものを拾おうとする
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            TryPickupItem();
         }
     }
 
     void PlaceItem()
     {
-        // データのチェック
-        if (itemToPlace == null)
+        if (holdingItem == null) return;
+
+        // ★修正点：アイテム固有のプレハブがあればそれを使い、無ければデフォルトのプレハブを使う
+        GameObject prefabToSpawn = holdingItem.itemPrefab != null ? holdingItem.itemPrefab : defaultItemPrefab;
+
+        // どちらのプレハブも存在しない場合は設置できないので処理を抜ける
+        if (prefabToSpawn == null)
         {
-            Debug.LogWarning("設置するアイテムデータがセットされていません！");
-            return;
-        }
-        if (itemToPlace.itemPrefab == null)
-        {
-            Debug.LogWarning("アイテムデータに3Dモデル（Prefab）が登録されていません！");
+            Debug.LogWarning($"{holdingItem.itemName} の配置用プレハブ（およびデフォルトプレハブ）が設定されていません！");
             return;
         }
 
-        // プレイヤーのカメラの正面方向から、設置する位置（座標）を計算する
         Vector3 spawnPosition = playerCamera.position + (playerCamera.forward * placeDistance);
-        
-        // 地面に置くため、高さ（Y軸）をプレイヤーの足元に合わせる調整（簡易版）
-        spawnPosition.y = transform.position.y;
+        Ray ray = new Ray(playerCamera.position, playerCamera.forward);
+        RaycastHit hit;
 
-        // ★データアセットに登録されている3Dモデルをゲーム世界に出現させる！
-        GameObject placedObject = Instantiate(itemToPlace.itemPrefab, spawnPosition, Quaternion.identity);
+        if (Physics.Raycast(ray, out hit, placeDistance))
+        {
+            spawnPosition = hit.point;
+        }
 
-        // 生成された物体の名前をアイテム名にする
-        placedObject.name = itemToPlace.itemName;
+        // 物体を出現させる
+        GameObject placedObject = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+        placedObject.name = holdingItem.itemName;
 
-        Debug.Log(itemToPlace.itemName + " を設置しました！");
+        // 出現させた物体に「拾える目印」がまだ付いていなければ自動でくっつけ、自身のデータを記憶させる
+        PickupableItem pickupScript = placedObject.GetComponent<PickupableItem>();
+        if (pickupScript == null)
+        {
+            pickupScript = placedObject.AddComponent<PickupableItem>();
+        }
+        pickupScript.Setup(holdingItem);
+
+        Debug.Log(holdingItem.itemName + " を設置しました。手持ちが空になりました。");
+        holdingItem = null; // 設置したので手持ちを空にする
+    }
+
+    void TryPickupItem()
+    {
+        if (holdingItem != null) return; // 手持ちがすでに埋まってたら拾えない
+
+        Ray ray = new Ray(playerCamera.position, playerCamera.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, pickupDistance))
+        {
+            PickupableItem targetItem = hit.collider.gameObject.GetComponentInParent<PickupableItem>();
+
+            if (targetItem != null)
+            {
+                holdingItem = targetItem.ItemData;
+                Destroy(targetItem.gameObject);
+                
+                Debug.Log(holdingItem.itemName + " を拾って手持ちに戻しました！もう一度Gキーで設置できます。");
+            }
+        }
     }
 }

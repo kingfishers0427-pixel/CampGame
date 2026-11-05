@@ -566,6 +566,8 @@ GameObject:
   - component: {fileID: 545928499}
   - component: {fileID: 545928503}
   - component: {fileID: 545928504}
+  - component: {fileID: 545928506}
+  - component: {fileID: 545928505}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -700,9 +702,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e361c2eedd2e89049aafffb6c2e8c745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemPlacer
-  itemToPlace: {fileID: 11400000, guid: 278651c91ad66fc4496f426d9d8e18d0, type: 2}
+  holdingItem: {fileID: 11400000, guid: 278651c91ad66fc4496f426d9d8e18d0, type: 2}
   playerCamera: {fileID: 330585546}
   placeDistance: 2
+  pickupDistance: 3
+  defaultItemPrefab: {fileID: 2257388017724223233, guid: 4636c65647a68aa4e92e01c5f897e021, type: 3}
+--- !u!114 &545928505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545928498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4187e6ecd8e19945b8f8b9f9f2d1741, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  initialItems:
+  - {fileID: 11400000, guid: cfb71ccdd3e58be4ea4f63cae9f795e5, type: 2}
+  - {fileID: 11400000, guid: 278651c91ad66fc4496f426d9d8e18d0, type: 2}
+  - {fileID: 11400000, guid: 5abd7da20dfe35f4582e005568deeeb1, type: 2}
+  - {fileID: 11400000, guid: 16287fc6055b4fd49a9aa111148fcfc8, type: 2}
+--- !u!114 &545928506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545928498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 389526a7480cb8d4f8732bf000edcded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventoryController
+  playerInventory: {fileID: 545928505}
+  dropPoint: {fileID: 0}
+  pickupablePrefab: {fileID: 2257388017724223233, guid: 4636c65647a68aa4e92e01c5f897e021, type: 3}
 --- !u!1 &662031507
 GameObject:
   m_ObjectHideFlags: 0
