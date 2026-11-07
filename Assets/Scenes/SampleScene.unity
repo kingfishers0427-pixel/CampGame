@@ -707,6 +707,8 @@ MonoBehaviour:
   placeDistance: 2
   pickupDistance: 3
   defaultItemPrefab: {fileID: 2257388017724223233, guid: 4636c65647a68aa4e92e01c5f897e021, type: 3}
+  grabMoveSpeed: 12
+  grabHoldDistance: 1.8
 --- !u!114 &545928505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1347,6 +1349,24 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 343177637}
   m_SourcePrefab: {fileID: 100100000, guid: 08947c7a31c49d1449c094c655e13f05, type: 3}
+--- !u!1 &1449174365 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4286554329654345292, guid: ea68f47c5100056478953585af08953a, type: 3}
+  m_PrefabInstance: {fileID: 3158461189549763495}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1449174369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449174365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a03cbe1656bf541bf96cf5cd303d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupableItem
+  itemData: {fileID: 0}
 --- !u!1 &1465815189 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3808654309867893315, guid: 08947c7a31c49d1449c094c655e13f05, type: 3}
@@ -1586,6 +1606,66 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1001 &3158461189549763495
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.033
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.536
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3474305969948058870, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4286554329654345292, guid: ea68f47c5100056478953585af08953a, type: 3}
+      propertyPath: m_Name
+      value: BeefMeat_Raw
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4286554329654345292, guid: ea68f47c5100056478953585af08953a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1449174369}
+  m_SourcePrefab: {fileID: 100100000, guid: ea68f47c5100056478953585af08953a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1601,3 +1681,4 @@ SceneRoots:
   - {fileID: 2126104919}
   - {fileID: 707746524}
   - {fileID: 1445821928}
+  - {fileID: 3158461189549763495}

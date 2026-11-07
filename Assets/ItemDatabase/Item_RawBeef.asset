@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: "\u751F\u306E\u8089"
   itemIcon: {fileID: 0}
+  itemPrefab: {fileID: 4286554329654345292, guid: ea68f47c5100056478953585af08953a, type: 3}
   itemDescription: "\u30AD\u30E3\u30F3\u30D7\u306E\u30E1\u30A4\u30F3\u30C7\u30A3\u30C3\u30B7\u30E5\u3002\u713C\u304D\u7DB2\u3067\u713C\u3044\u3066\u98DF\u3079\u308B\u3002"
   odorRadius: 15
   isEdible: 1
