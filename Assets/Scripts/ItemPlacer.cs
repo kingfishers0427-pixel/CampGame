@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class ItemPlacer : MonoBehaviour
 {
-    [Header("現在の手持ちアイテムデータ（空でもOK）")]
-    public ItemData holdingItem; 
-
     [Header("プレイヤーのカメラ（レティクルの中心用）")]
     public Transform playerCamera; 
 
@@ -15,10 +12,13 @@ public class ItemPlacer : MonoBehaviour
     [Header("追加：アイテム固有のプレハブが無い場合に使う汎用プレハブ")]
     public GameObject defaultItemPrefab; 
 
-    [Header("★新機能：物理ドラッグ操作の設定")]
-    public float grabMoveSpeed = 12f;      // アイテムが手元に移動してくる追従スピード
-    public float grabHoldDistance = 1.8f;  // 掴んでいる間、カメラからどれくらい離すか
-    private Rigidbody grabbedRigidbody;    // 現在左クリックで掴んでいるアイテムのRigidbody
+    [Header("物理ドラッグ操作の設定")]
+    public float grabMoveSpeed = 12f;     
+    public float grabHoldDistance = 1.8f; 
+    private Rigidbody grabbedRigidbody;   
+
+    // ★追加：連動させるリュックスクリプトの参照
+    private PlayerInventoryController inventory;
 
     void Start()
     {
@@ -26,15 +26,22 @@ public class ItemPlacer : MonoBehaviour
         {
             playerCamera = Camera.main.transform;
         }
+
+        // 同じPlayerオブジェクトからリュックのコンポーネントを取得
+        inventory = GetComponent<PlayerInventoryController>();
+        if (inventory == null)
+        {
+            Debug.LogError("Playerに PlayerInventoryController スクリプトがついていません！");
+        }
     }
 
     void Update()
     {
         // -------------------------------------------------------------
-        // 1. インベントリ操作システム（Gキー / Eキー）
+        // 1. インベントリ操作システム（Gキー / Eキー連動版）
         // -------------------------------------------------------------
-        // 【Gキー】手持ちがあり、レティクルが有効な位置にあれば設置
-        if (Input.GetKeyDown(KeyCode.G) && holdingItem != null)
+        // 【Gキー】リュックの選択中のスロットにアイテムがあれば設置
+        if (Input.GetKeyDown(KeyCode.G) && inventory != null && inventory.GetCurrentItem() != null)
         {
             PlaceItem();
         }
@@ -48,48 +55,40 @@ public class ItemPlacer : MonoBehaviour
         // -------------------------------------------------------------
         // 2. 物理ドラッグシステム（左クリック長押し）
         // -------------------------------------------------------------
-        // クリックした瞬間：正面の物理オブジェクトを掴む
         if (Input.GetMouseButtonDown(0))
         {
-            if (grabbedRigidbody == null)
-            {
-                TryGrabItemPhysics();
-            }
+            if (grabbedRigidbody == null) TryGrabItemPhysics();
         }
 
-        // クリックを離した瞬間：掴んでいたオブジェクトを落とす
         if (Input.GetMouseButtonUp(0))
         {
-            if (grabbedRigidbody != null)
-            {
-                ReleaseGrabbedItem();
-            }
+            if (grabbedRigidbody != null) ReleaseGrabbedItem();
         }
     }
 
     void FixedUpdate()
     {
-        // 掴んでいる間、カメラの正面にスムーズかつ物理的に追従させる
         if (grabbedRigidbody != null)
         {
             Vector3 targetPosition = playerCamera.position + (playerCamera.forward * grabHoldDistance);
             Vector3 newVelocity = (targetPosition - grabbedRigidbody.position) * grabMoveSpeed;
             
-            // 最新のUnity仕様（linearVelocity / angularVelocity）
             grabbedRigidbody.linearVelocity = newVelocity;
-            grabbedRigidbody.angularVelocity = Vector3.zero; // 持っている間は勝手に回転させない
+            grabbedRigidbody.angularVelocity = Vector3.zero; 
         }
     }
 
     void PlaceItem()
     {
-        if (holdingItem == null) return;
+        // ★修正：手持ちデータではなく、リュックで現在選んでいるアイテムを呼び出す
+        ItemData itemToPlace = inventory.GetCurrentItem();
+        if (itemToPlace == null) return;
 
-        GameObject prefabToSpawn = holdingItem.itemPrefab != null ? holdingItem.itemPrefab : defaultItemPrefab;
+        GameObject prefabToSpawn = itemToPlace.itemPrefab != null ? itemToPlace.itemPrefab : defaultItemPrefab;
 
         if (prefabToSpawn == null)
         {
-            Debug.LogWarning($"{holdingItem.itemName} の配置用プレハブ（およびデフォルトプレハブ）が設定されていません！");
+            Debug.LogWarning($"{itemToPlace.itemName} の配置用プレハブが設定されていません！");
             return;
         }
 
@@ -99,27 +98,31 @@ public class ItemPlacer : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, placeDistance))
         {
-            spawnPosition = hit.point + Vector3.up * 0.05f;
+            spawnPosition = hit.point + Vector3.up * 0.05f; // 床抜け防止
         }
 
-        GameObject placedObject = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
-        placedObject.name = holdingItem.itemName;
+        // ★最新修正：アイテムデータに登録された固有の回転角度（defaultSpawnRotation）を適用する
+        Quaternion spawnRotation = Quaternion.Euler(itemToPlace.defaultSpawnRotation);
+
+        // Quaternion.identity の代わりに spawnRotation を渡して生成
+        GameObject placedObject = Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
+        placedObject.name = itemToPlace.itemName;
 
         PickupableItem pickupScript = placedObject.GetComponent<PickupableItem>();
         if (pickupScript == null)
         {
             pickupScript = placedObject.AddComponent<PickupableItem>();
         }
-        pickupScript.Setup(holdingItem);
+        pickupScript.Setup(itemToPlace);
 
-        Debug.Log(holdingItem.itemName + " を設置しました。手持ちが空になりました。");
-        holdingItem = null; 
+        Debug.Log(itemToPlace.itemName + " をリュックから取り出して設置しました。");
+        
+        // ★修正：設置が成功したので、リュックのそのスロットを空にする
+        inventory.RemoveCurrentItem();
     }
 
     void TryPickupItem()
     {
-        if (holdingItem != null) return; 
-
         Ray ray = new Ray(playerCamera.position, playerCamera.forward);
         RaycastHit hit;
 
@@ -129,15 +132,16 @@ public class ItemPlacer : MonoBehaviour
 
             if (targetItem != null)
             {
-                if (grabbedRigidbody != null && grabbedRigidbody.gameObject == targetItem.gameObject)
+                // ★修正：拾ったデータを「リュックの空きスロット」にしまおうとする
+                if (inventory != null && inventory.AddItem(targetItem.ItemData))
                 {
-                    ReleaseGrabbedItem();
+                    // リュックに無事入ったら、ドラッグを解除してフィールドから消す
+                    if (grabbedRigidbody != null && grabbedRigidbody.gameObject == targetItem.gameObject)
+                    {
+                        ReleaseGrabbedItem();
+                    }
+                    Destroy(targetItem.gameObject);
                 }
-
-                holdingItem = targetItem.ItemData;
-                Destroy(targetItem.gameObject);
-                
-                Debug.Log(holdingItem.itemName + " を拾って手持ちに戻しました！もう一度Gキーで設置できます。");
             }
         }
     }
@@ -158,7 +162,7 @@ public class ItemPlacer : MonoBehaviour
                 {
                     grabbedRigidbody = rb;
                     grabbedRigidbody.useGravity = false; 
-                    grabbedRigidbody.linearDamping = 10f; // ★drag を linearDamping に修正（空気抵抗）
+                    grabbedRigidbody.linearDamping = 10f; 
                 }
             }
         }
@@ -167,7 +171,7 @@ public class ItemPlacer : MonoBehaviour
     void ReleaseGrabbedItem()
     {
         grabbedRigidbody.useGravity = true;  
-        grabbedRigidbody.linearDamping = 0f;  // ★ここも linearDamping に修正
+        grabbedRigidbody.linearDamping = 0f;  
         grabbedRigidbody.linearVelocity = Vector3.zero; 
         grabbedRigidbody.angularVelocity = Vector3.zero;
         grabbedRigidbody = null;

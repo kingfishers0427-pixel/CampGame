@@ -2,73 +2,62 @@ using UnityEngine;
 
 public class PlayerInventoryController : MonoBehaviour
 {
-    [Header("参照")]
-    [SerializeField] private Inventory playerInventory;
-    [SerializeField] private Transform dropPoint; // アイテムを取り出した時に出現させる位置（プレイヤーの手前など）
+    [Header("リュックのスロット（最大4つ）")]
+    public ItemData[] inventorySlots = new ItemData[4];
 
-    [Header("取り出し用プレハブ設定")]
-    [SerializeField] private GameObject pickupablePrefab; // PickupableItemスクリプトがついた汎用ベースオブジェクト、または各アイテムのプレハブ
+    [Header("現在選択しているスロット番号 (0～3)")]
+    public int currentSlotIndex = 0;
 
-    private PickupableItem currentTargetItem; // いま目の前（トリガー内）にあるアイテム
-
-    private void Update()
+    void Update()
     {
-        // 【拾う】目の前にアイテムがあり、Eキーが押されたらリュックに入れる
-        if (Input.GetKeyDown(KeyCode.E) && currentTargetItem != null)
-        {
-            playerInventory.AddItem(currentTargetItem.ItemData);
-            Destroy(currentTargetItem.gameObject); // 地面のオブジェクトを消す
-            currentTargetItem = null;
-        }
+        // 【1～4キー】でリュックの中身を選択切り替え
+        if (Input.GetKeyDown(KeyCode.Alpha1)) ChangeSlot(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) ChangeSlot(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) ChangeSlot(2);
+        if (Input.GetKeyDown(KeyCode.Alpha4)) ChangeSlot(3);
+    }
 
-        // 【取り出す】Qキーが押されたら、リュックからアイテムを1つ取り出して地面に生成する
-        if (Input.GetKeyDown(KeyCode.Q))
+    // スロットを切り替える処理
+    void ChangeSlot(int index)
+    {
+        currentSlotIndex = index;
+        ItemData selectedItem = inventorySlots[currentSlotIndex];
+
+        if (selectedItem != null)
         {
-            DropItem();
+            Debug.Log($"【リュック】スロット {index + 1} : 「{selectedItem.itemName}」を選択中");
+        }
+        else
+        {
+            Debug.Log($"【リュック】スロット {index + 1} : （空っぽ）を選択中");
         }
     }
 
-    private void DropItem()
+    // アイテムをリュックの空きスロットにしまう処理（成功したらtrueを返す）
+    public bool AddItem(ItemData item)
     {
-        if (playerInventory.IsEmpty()) return;
-
-        // リュックからデータを1つ取得
-        ItemData removedData = playerInventory.RemoveLastItem();
-
-        if (removedData != null && pickupablePrefab != null)
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            // プレイヤーの目の前（dropPoint）に実体を生成
-            Vector3 spawnPosition = dropPoint != null ? dropPoint.position : transform.position + transform.forward * 1.5f;
-            GameObject spawnedObj = Instantiate(pickupablePrefab, spawnPosition, Quaternion.identity);
-
-            // 生成したオブジェクトに「お前の中身はこのItemDataだよ」と覚えさせる
-            PickupableItem pickupScript = spawnedObj.GetComponent<PickupableItem>();
-            if (pickupScript != null)
+            if (inventorySlots[i] == null)
             {
-                pickupScript.Setup(removedData);
+                inventorySlots[i] = item;
+                Debug.Log($"【リュック】スロット {i + 1} に「{item.itemName}」をしまいました！");
+                return true;
             }
         }
+        Debug.LogWarning("リュックがいっぱいでこれ以上入りません！");
+        return false;
     }
 
-    // エリア内に入ったアイテムをロックオンする（簡易的なトリガー判定）
-    private void OnTriggerEnter(Collider other)
+    // 現在選択しているアイテムのデータを取得する
+    public ItemData GetCurrentItem()
     {
-        PickupableItem item = other.GetComponent<PickupableItem>();
-        if (item != null)
-        {
-            currentTargetItem = item;
-            Debug.Log($"「{item.ItemData.itemName}」に近づいた（Eキーで拾う）");
-        }
+        return inventorySlots[currentSlotIndex];
     }
 
-    // エリアから離れたらロックオン解除
-    private void OnTriggerExit(Collider other)
+    // 現在選択しているアイテムをリュックから消費（削除）する
+    public void RemoveCurrentItem()
     {
-        PickupableItem item = other.GetComponent<PickupableItem>();
-        if (item != null && currentTargetItem == item)
-        {
-            currentTargetItem = null;
-            Debug.Log("アイテムから離れた");
-        }
+        inventorySlots[currentSlotIndex] = null;
     }
 }

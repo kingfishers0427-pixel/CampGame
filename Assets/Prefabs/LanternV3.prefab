@@ -154,6 +154,7 @@ GameObject:
   - component: {fileID: 6988428295047455750}
   - component: {fileID: 1395815306388024621}
   - component: {fileID: 9099816189628929433}
+  - component: {fileID: 3334951125360417876}
   m_Layer: 0
   m_Name: LanternV3
   m_TagString: Untagged
@@ -207,7 +208,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &9099816189628929433
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -229,6 +230,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 9.07, y: 17.8, z: 5.94}
   m_Center: {x: 0, y: 8.96, z: 0.01}
+--- !u!114 &3334951125360417876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6988428295046969382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7a03cbe1656bf541bf96cf5cd303d30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupableItem
+  itemData: {fileID: 11400000, guid: 278651c91ad66fc4496f426d9d8e18d0, type: 2}
 --- !u!1 &6988428295046969384
 GameObject:
   m_ObjectHideFlags: 0

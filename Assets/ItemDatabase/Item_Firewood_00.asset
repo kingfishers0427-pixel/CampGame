@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cfe9a2e86c2ef934baa11240e64b7f49, type: 3}
-  m_Name: Item_RainbowTrout
+  m_Name: Item_Firewood_00
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\u30CB\u30B8\u30DE\u30B9"
+  itemName: "\u85AA"
   itemIcon: {fileID: 0}
-  itemDescription: "\u5DDD\u3067\u91E3\u3063\u305F\u65B0\u9BAE\u306A\u9B5A\u3002\u634C\u3044\u3066\u304B\u3089\u713C\u304F\u5FC5\u8981\u304C\u3042\u308B\u3002"
-  odorRadius: 8
-  isEdible: 1
-  isFuel: 0
+  itemPrefab: {fileID: 8773398926376226117, guid: 59b9a6a7741df65409d5e88ec40d1944, type: 3}
+  itemDescription: "\u65A7\u3067\u5272\u5272\u308B\u524D\u306E\u4E7E\u71E5\u3057\u305F\u85AA\u3002\n\u711A\u304D\u706B\u306B\u304F\u3079\u308B\u3068\u706B\u304C\u9577\u6301\u3061\u3059\u308B"
+  odorRadius: 0
+  isEdible: 0
+  isFuel: 1
