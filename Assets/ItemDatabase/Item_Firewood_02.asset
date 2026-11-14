@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfe9a2e86c2ef934baa11240e64b7f49, type: 3}
+  m_Name: Item_Firewood_02
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: "\u85AA(\u527202)"
+  itemIcon: {fileID: 0}
+  itemPrefab: {fileID: 3955711340799413929, guid: 367638915e857ed468781f3b9c1d9906, type: 3}
+  defaultSpawnRotation: {x: 0, y: 0, z: 0}
+  itemDescription: "\u65A7\u3067\u5272\u3089\u308C\u305F\u85AA"
+  odorRadius: 0
+  isEdible: 0
+  isFuel: 1

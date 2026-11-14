@@ -10,8 +10,10 @@ public class ItemData : ScriptableObject
     public string itemName;                              // アイテムのゲーム内表示名
     public Sprite itemIcon;                              // インベントリ用のアイコン画像（仮オブジェクト時は空でOK）
     public GameObject itemPrefab;
-    public Vector3 defaultSpawnRotation = Vector3.zero;  // アイテム生成時のデフォルトの回転角度を保存する変数
-    
+
+    [Header("取り出し時の初期回転角度 (度数法)")]
+    public Vector3 defaultSpawnRotation = Vector3.zero;
+
     [Multiline(3)]
     public string itemDescription;     // アイテムの簡単な説明文
 

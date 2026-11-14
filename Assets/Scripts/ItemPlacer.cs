@@ -15,9 +15,9 @@ public class ItemPlacer : MonoBehaviour
     [Header("物理ドラッグ操作の設定")]
     public float grabMoveSpeed = 12f;     
     public float grabHoldDistance = 1.8f; 
-    private Rigidbody grabbedRigidbody;   
+    private Rigidbody grabbedRigidbody;
+    private HoldableOrientation grabbedOrientation;
 
-    // ★追加：連動させるリュックスクリプトの参照
     private PlayerInventoryController inventory;
 
     void Start()
@@ -27,7 +27,6 @@ public class ItemPlacer : MonoBehaviour
             playerCamera = Camera.main.transform;
         }
 
-        // 同じPlayerオブジェクトからリュックのコンポーネントを取得
         inventory = GetComponent<PlayerInventoryController>();
         if (inventory == null)
         {
@@ -37,24 +36,16 @@ public class ItemPlacer : MonoBehaviour
 
     void Update()
     {
-        // -------------------------------------------------------------
-        // 1. インベントリ操作システム（Gキー / Eキー連動版）
-        // -------------------------------------------------------------
-        // 【Gキー】リュックの選択中のスロットにアイテムがあれば設置
         if (Input.GetKeyDown(KeyCode.G) && inventory != null && inventory.GetCurrentItem() != null)
         {
             PlaceItem();
         }
 
-        // 【Eキー】目の前のものをインベントリに拾おうとする
         if (Input.GetKeyDown(KeyCode.E))
         {
             TryPickupItem();
         }
 
-        // -------------------------------------------------------------
-        // 2. 物理ドラッグシステム（左クリック長押し）
-        // -------------------------------------------------------------
         if (Input.GetMouseButtonDown(0))
         {
             if (grabbedRigidbody == null) TryGrabItemPhysics();
@@ -75,12 +66,23 @@ public class ItemPlacer : MonoBehaviour
             
             grabbedRigidbody.linearVelocity = newVelocity;
             grabbedRigidbody.angularVelocity = Vector3.zero; 
+
+            if (grabbedOrientation != null && grabbedOrientation.alignWhenHeld)
+            {
+                Quaternion targetRotation = grabbedOrientation.GetTargetRotation(playerCamera);
+                
+                Quaternion smoothRotation = Quaternion.Slerp(
+                    grabbedRigidbody.rotation, 
+                    targetRotation, 
+                    Time.fixedDeltaTime * grabbedOrientation.alignSpeed
+                );
+                grabbedRigidbody.MoveRotation(smoothRotation);
+            }
         }
     }
 
     void PlaceItem()
     {
-        // ★修正：手持ちデータではなく、リュックで現在選んでいるアイテムを呼び出す
         ItemData itemToPlace = inventory.GetCurrentItem();
         if (itemToPlace == null) return;
 
@@ -98,13 +100,11 @@ public class ItemPlacer : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, placeDistance))
         {
-            spawnPosition = hit.point + Vector3.up * 0.05f; // 床抜け防止
+            spawnPosition = hit.point + Vector3.up * 0.05f;
         }
 
-        // ★最新修正：アイテムデータに登録された固有の回転角度（defaultSpawnRotation）を適用する
         Quaternion spawnRotation = Quaternion.Euler(itemToPlace.defaultSpawnRotation);
 
-        // Quaternion.identity の代わりに spawnRotation を渡して生成
         GameObject placedObject = Instantiate(prefabToSpawn, spawnPosition, spawnRotation);
         placedObject.name = itemToPlace.itemName;
 
@@ -117,7 +117,6 @@ public class ItemPlacer : MonoBehaviour
 
         Debug.Log(itemToPlace.itemName + " をリュックから取り出して設置しました。");
         
-        // ★修正：設置が成功したので、リュックのそのスロットを空にする
         inventory.RemoveCurrentItem();
     }
 
@@ -132,10 +131,8 @@ public class ItemPlacer : MonoBehaviour
 
             if (targetItem != null)
             {
-                // ★修正：拾ったデータを「リュックの空きスロット」にしまおうとする
                 if (inventory != null && inventory.AddItem(targetItem.ItemData))
                 {
-                    // リュックに無事入ったら、ドラッグを解除してフィールドから消す
                     if (grabbedRigidbody != null && grabbedRigidbody.gameObject == targetItem.gameObject)
                     {
                         ReleaseGrabbedItem();
@@ -157,12 +154,27 @@ public class ItemPlacer : MonoBehaviour
 
             if (targetItem != null)
             {
-                Rigidbody rb = targetItem.GetComponent<Rigidbody>();
+                Rigidbody rb = targetItem.GetComponentInParent<Rigidbody>();
+                if (rb == null) rb = targetItem.GetComponentInChildren<Rigidbody>();
+
                 if (rb != null)
                 {
                     grabbedRigidbody = rb;
                     grabbedRigidbody.useGravity = false; 
                     grabbedRigidbody.linearDamping = 10f; 
+
+                    grabbedOrientation = rb.GetComponent<HoldableOrientation>();
+                    if (grabbedOrientation == null) grabbedOrientation = rb.GetComponentInChildren<HoldableOrientation>();
+                    if (grabbedOrientation == null) grabbedOrientation = rb.GetComponentInParent<HoldableOrientation>();
+
+                    if (grabbedOrientation != null)
+                    {
+                        Debug.Log($"姿勢制御ON: {grabbedOrientation.gameObject.name} を掴みました！");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("掴んだオブジェクトに HoldableOrientation が見つかりません！");
+                    }
                 }
             }
         }
@@ -175,5 +187,6 @@ public class ItemPlacer : MonoBehaviour
         grabbedRigidbody.linearVelocity = Vector3.zero; 
         grabbedRigidbody.angularVelocity = Vector3.zero;
         grabbedRigidbody = null;
+        grabbedOrientation = null;
     }
 }

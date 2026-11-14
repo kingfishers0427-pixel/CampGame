@@ -69,6 +69,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a1032cf7016b6a4a85c9d4d8ef29f82, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4655445227860893640}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a1032cf7016b6a4a85c9d4d8ef29f82, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6919646889094129632}
   m_SourcePrefab: {fileID: 100100000, guid: 6a1032cf7016b6a4a85c9d4d8ef29f82, type: 3}
 --- !u!1 &8773398926376226117 stripped
 GameObject:
@@ -136,3 +139,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupableItem
   itemData: {fileID: 11400000, guid: 5abd7da20dfe35f4582e005568deeeb1, type: 2}
+--- !u!114 &6919646889094129632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8773398926376226117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64e88f2bd62583246b91761d79393d84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplittableLog
+  splitWoodPrefab: {fileID: 2346100100830626233, guid: 982298bd4323b9a4ebec312d07444557, type: 3}
+  spawnCount: 2
+  requiredImpactSpeed: 6
+  bladeAngleThreshold: 0.6
+  splitSounds:
+  - {fileID: 8300000, guid: ab8c0c0ca93a43842b6d02ebfff50762, type: 3}
+  - {fileID: 8300000, guid: 22ac0e813c918a648aafc9d03477f88a, type: 3}
+  - {fileID: 8300000, guid: 11c9841d4d04f7c46a03a3c4c3bd815c, type: 3}
+  - {fileID: 8300000, guid: a2b9e41248c68ec4d873a37a912b311c, type: 3}
+  - {fileID: 8300000, guid: a56ebfc10319c6d4ca6f2d9d401aa57b, type: 3}
+  - {fileID: 8300000, guid: c4ce1b2debbbdcb40af64d28935d41df, type: 3}
+  - {fileID: 8300000, guid: cb537b5c3477eea49882268ea2440032, type: 3}
+  splitVolume: 1
+  failHitSound: {fileID: 8300000, guid: 095e2b5d7926e924ab0033429b3c9f8e, type: 3}
+  failVolume: 0.8
+  soundStartOffset: 0.5
+  showImpactLog: 1

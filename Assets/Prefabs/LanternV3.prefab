@@ -155,6 +155,7 @@ GameObject:
   - component: {fileID: 1395815306388024621}
   - component: {fileID: 9099816189628929433}
   - component: {fileID: 3334951125360417876}
+  - component: {fileID: 1205369190850525518}
   m_Layer: 0
   m_Name: LanternV3
   m_TagString: Untagged
@@ -243,6 +244,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupableItem
   itemData: {fileID: 11400000, guid: 278651c91ad66fc4496f426d9d8e18d0, type: 2}
+--- !u!114 &1205369190850525518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6988428295046969382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d7d9f872a990b94d832b393e7efe13f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoldableOrientation
+  alignWhenHeld: 1
+  ignoreVerticalPitch: 1
+  holdRotationOffset: {x: 0, y: 0, z: 0}
+  alignSpeed: 15
 --- !u!1 &6988428295046969384
 GameObject:
   m_ObjectHideFlags: 0
