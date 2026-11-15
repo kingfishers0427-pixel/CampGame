@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     public float VerticalRotation => verticalRotation;    // 外部（カメラ）から角度を読み取るための窓口
 
     private Camera mainCamera;
+    public bool isLookLocked = false;
+
 
     private void OnEnable()
     {
@@ -42,7 +44,10 @@ public class PlayerController : MonoBehaviour
         // 今がどっちのモードかによって、Updateでの処理（操作の受付）を分ける
         if (GameManager.Instance.CurrentMode == CameraMode.FPS)
         {
-            HandleFPSRotation(); // FPS時はマウスで首振り
+            if (!isLookLocked)
+            {
+                HandleFPSRotation(); // FPS時はマウスで首振り
+            }
             HandleFPSInteract(); // 毎フレーム正面に触れるものがないか監視
         }
         else if (GameManager.Instance.CurrentMode == CameraMode.TopDown)

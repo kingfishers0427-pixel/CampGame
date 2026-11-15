@@ -15,8 +15,22 @@ public class ItemPlacer : MonoBehaviour
     [Header("物理ドラッグ操作の設定")]
     public float grabMoveSpeed = 12f;     
     public float grabHoldDistance = 1.8f; 
+    public float minHoldDistance = 0.8f;  // 手前に寄せられる限界距離
+    public float maxHoldDistance = 3.5f;  // 奥へ離せる限界距離
+    private float currentHoldDistance;
     private Rigidbody grabbedRigidbody;
     private HoldableOrientation grabbedOrientation;
+
+    [Header("掴み中のアイテム操作設定（R:回転 / Ctrl:上下左右 / ホイール:奥前）")]
+    public float itemRotateSpeed = 5.0f;
+    public float itemSlideSpeed = 0.05f;
+    public float itemScrollSpeed = 0.5f;
+    public CameraController cameraController;
+
+    private PlayerController playerController;
+    private bool isManipulatingItem = false; // 回転またはスライド操作中か
+    private Quaternion manualTargetRotation;
+    private Vector3 manualPositionOffset = Vector3.zero; // 上下左右の微調整オフセット
 
     private PlayerInventoryController inventory;
 
@@ -28,6 +42,8 @@ public class ItemPlacer : MonoBehaviour
         }
 
         inventory = GetComponent<PlayerInventoryController>();
+        playerController = GetComponent<PlayerController>();
+
         if (inventory == null)
         {
             Debug.LogError("Playerに PlayerInventoryController スクリプトがついていません！");
@@ -55,19 +71,88 @@ public class ItemPlacer : MonoBehaviour
         {
             if (grabbedRigidbody != null) ReleaseGrabbedItem();
         }
+
+        HandleItemManipulationInput();
+    }
+
+    void HandleItemManipulationInput()
+    {
+        if (grabbedRigidbody == null)
+        {
+            if (isManipulatingItem) SetManipulationMode(false);
+            return;
+        }
+
+        // 1. マウスホイールで「奥・手前」の距離を調整（常に有効）
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.001f)
+        {
+            currentHoldDistance = Mathf.Clamp(currentHoldDistance + scroll * itemScrollSpeed, minHoldDistance, maxHoldDistance);
+        }
+
+        bool isRotateKey = Input.GetKey(KeyCode.R);
+        bool isSlideKey = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+
+        // 2. Rキーで「回転」、Ctrlキーで「上下・左右スライド」
+        if (isRotateKey || isSlideKey)
+        {
+            if (!isManipulatingItem)
+            {
+                SetManipulationMode(true);
+            }
+
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+
+            if (isRotateKey)
+            {
+                // 角度の回転
+                Quaternion yaw = Quaternion.AngleAxis(-mouseX * itemRotateSpeed, Vector3.up);
+                Quaternion pitch = Quaternion.AngleAxis(mouseY * itemRotateSpeed, playerCamera.right);
+                manualTargetRotation = yaw * pitch * manualTargetRotation;
+            }
+            else if (isSlideKey)
+            {
+                // 上下・左右への位置スライド（カメラの右方向・上方向を基準にずらす）
+                Vector3 slideDelta = (playerCamera.right * mouseX + playerCamera.up * mouseY) * itemSlideSpeed;
+                manualPositionOffset += slideDelta;
+
+                // 画面外へ行き過ぎないように移動範囲を制限（±1.0m以内）
+                manualPositionOffset = Vector3.ClampMagnitude(manualPositionOffset, 1.0f);
+            }
+        }
+        else if (isManipulatingItem)
+        {
+            SetManipulationMode(false);
+        }
+    }
+
+    void SetManipulationMode(bool active)
+    {
+        isManipulatingItem = active;
+
+        if (cameraController != null)
+        {
+            cameraController.isCameraLocked = active;
+        }
+        if (playerController != null)
+        {
+            playerController.isLookLocked = active;
+        }
     }
 
     void FixedUpdate()
     {
         if (grabbedRigidbody != null)
         {
-            Vector3 targetPosition = playerCamera.position + (playerCamera.forward * grabHoldDistance);
+            // 基本位置 ＋ 奥前距離 ＋ 上下左右の微調整オフセット
+            Vector3 targetPosition = playerCamera.position + (playerCamera.forward * currentHoldDistance) + manualPositionOffset;
             Vector3 newVelocity = (targetPosition - grabbedRigidbody.position) * grabMoveSpeed;
             
             grabbedRigidbody.linearVelocity = newVelocity;
             grabbedRigidbody.angularVelocity = Vector3.zero; 
 
-            if (grabbedOrientation != null && grabbedOrientation.alignWhenHeld)
+            if (grabbedOrientation != null && grabbedOrientation.alignWhenHeld && !Input.GetKey(KeyCode.R))
             {
                 Quaternion targetRotation = grabbedOrientation.GetTargetRotation(playerCamera);
                 
@@ -75,6 +160,16 @@ public class ItemPlacer : MonoBehaviour
                     grabbedRigidbody.rotation, 
                     targetRotation, 
                     Time.fixedDeltaTime * grabbedOrientation.alignSpeed
+                );
+                grabbedRigidbody.MoveRotation(smoothRotation);
+                manualTargetRotation = smoothRotation;
+            }
+            else
+            {
+                Quaternion smoothRotation = Quaternion.Slerp(
+                    grabbedRigidbody.rotation, 
+                    manualTargetRotation, 
+                    Time.fixedDeltaTime * 20f
                 );
                 grabbedRigidbody.MoveRotation(smoothRotation);
             }
@@ -115,8 +210,6 @@ public class ItemPlacer : MonoBehaviour
         }
         pickupScript.Setup(itemToPlace);
 
-        Debug.Log(itemToPlace.itemName + " をリュックから取り出して設置しました。");
-        
         inventory.RemoveCurrentItem();
     }
 
@@ -163,18 +256,15 @@ public class ItemPlacer : MonoBehaviour
                     grabbedRigidbody.useGravity = false; 
                     grabbedRigidbody.linearDamping = 10f; 
 
+                    // 掴んだ瞬間の距離と角度を初期化
+                    currentHoldDistance = Vector3.Distance(playerCamera.position, rb.position);
+                    currentHoldDistance = Mathf.Clamp(currentHoldDistance, minHoldDistance, maxHoldDistance);
+                    manualPositionOffset = Vector3.zero;
+                    manualTargetRotation = grabbedRigidbody.rotation;
+
                     grabbedOrientation = rb.GetComponent<HoldableOrientation>();
                     if (grabbedOrientation == null) grabbedOrientation = rb.GetComponentInChildren<HoldableOrientation>();
                     if (grabbedOrientation == null) grabbedOrientation = rb.GetComponentInParent<HoldableOrientation>();
-
-                    if (grabbedOrientation != null)
-                    {
-                        Debug.Log($"姿勢制御ON: {grabbedOrientation.gameObject.name} を掴みました！");
-                    }
-                    else
-                    {
-                        Debug.LogWarning("掴んだオブジェクトに HoldableOrientation が見つかりません！");
-                    }
                 }
             }
         }
@@ -182,11 +272,14 @@ public class ItemPlacer : MonoBehaviour
 
     void ReleaseGrabbedItem()
     {
+        if (isManipulatingItem) SetManipulationMode(false);
+
         grabbedRigidbody.useGravity = true;  
         grabbedRigidbody.linearDamping = 0f;  
         grabbedRigidbody.linearVelocity = Vector3.zero; 
         grabbedRigidbody.angularVelocity = Vector3.zero;
         grabbedRigidbody = null;
         grabbedOrientation = null;
+        manualPositionOffset = Vector3.zero;
     }
 }

@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6a0151a84f227df42bc80184ca5b8e4e, type: 3}
       propertyPath: m_Name
-      value: Firewood_02 1
+      value: Firewood_02
       objectReference: {fileID: 0}
     - target: {fileID: 3342933498853523284, guid: 6a0151a84f227df42bc80184ca5b8e4e, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -110,8 +110,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.110897504, y: 0.095262475, z: 0.40859222}
-  m_Center: {x: -0.008069306, y: 0.040587485, z: -0.005129993}
+  m_Size: {x: 0.09659113, y: 0.08254575, z: 0.3903122}
+  m_Center: {x: -0.007274481, y: 0.040587492, z: -0.0047325315}
 --- !u!54 &3099500776542452737
 Rigidbody:
   m_ObjectHideFlags: 0

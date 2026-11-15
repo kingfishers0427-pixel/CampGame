@@ -17,6 +17,7 @@ public class CameraController : MonoBehaviour
     // 現在目指すべきカメラの「目標座標」と「目標角度」
     private Vector3 targetPosition;
     private Quaternion targetRotation;
+    public bool isCameraLocked = false;
 
     private void OnEnable()
     {
@@ -54,6 +55,7 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isCameraLocked) return;
         if (playerTransform == null) return;
 
         // モードごとに、毎フレーム「最新の目標座標」を更新する

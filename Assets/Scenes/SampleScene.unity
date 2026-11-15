@@ -863,6 +863,8 @@ MonoBehaviour:
   defaultItemPrefab: {fileID: 2257388017724223233, guid: 4636c65647a68aa4e92e01c5f897e021, type: 3}
   grabMoveSpeed: 12
   grabHoldDistance: 1.8
+  itemRotateSpeed: 5
+  cameraLookScript: {fileID: 330585548}
 --- !u!114 &545928505
 MonoBehaviour:
   m_ObjectHideFlags: 0
