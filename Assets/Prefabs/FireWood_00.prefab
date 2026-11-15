@@ -165,6 +165,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: cb537b5c3477eea49882268ea2440032, type: 3}
   splitVolume: 1
   failHitSound: {fileID: 8300000, guid: 095e2b5d7926e924ab0033429b3c9f8e, type: 3}
-  failVolume: 0.8
+  failVolume: 1
   soundStartOffset: 0.5
   showImpactLog: 1
