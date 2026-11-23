@@ -146,11 +146,14 @@ public class ItemPlacer : MonoBehaviour
         if (grabbedRigidbody != null)
         {
             // 基本位置 ＋ 奥前距離 ＋ 上下左右の微調整オフセット
-            Vector3 targetPosition = playerCamera.position + (playerCamera.forward * currentHoldDistance) + manualPositionOffset;
-            Vector3 newVelocity = (targetPosition - grabbedRigidbody.position) * grabMoveSpeed;
-            
-            grabbedRigidbody.linearVelocity = newVelocity;
-            grabbedRigidbody.angularVelocity = Vector3.zero; 
+            if (!grabbedRigidbody.isKinematic) // isKinematic（固定状態）でない場合のみ速度と回転速度を操作する
+            {
+                Vector3 targetPosition = playerCamera.position + (playerCamera.forward * currentHoldDistance) + manualPositionOffset;
+                Vector3 newVelocity = (targetPosition - grabbedRigidbody.position) * grabMoveSpeed;
+                
+                grabbedRigidbody.linearVelocity = newVelocity;
+                grabbedRigidbody.angularVelocity = Vector3.zero;
+            }
 
             if (grabbedOrientation != null && grabbedOrientation.alignWhenHeld && !Input.GetKey(KeyCode.R))
             {
@@ -220,6 +223,14 @@ public class ItemPlacer : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, pickupDistance))
         {
+            // ★追加：火が付いている薪は熱くてリュックにしまえない
+            BurnableWood burningWood = hit.collider.gameObject.GetComponentInParent<BurnableWood>();
+            if (burningWood != null && burningWood.IsBurning)
+            {
+                Debug.Log("燃えている薪は熱くて拾えません！");
+                return;
+            }
+
             PickupableItem targetItem = hit.collider.gameObject.GetComponentInParent<PickupableItem>();
 
             if (targetItem != null)
@@ -243,6 +254,14 @@ public class ItemPlacer : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, pickupDistance))
         {
+            // 火が付いている薪は掴んで移動できない
+            BurnableWood burningWood = hit.collider.gameObject.GetComponentInParent<BurnableWood>();
+            if (burningWood != null && burningWood.IsBurning)
+            {
+                Debug.Log("燃えている薪は熱くて掴めません！");
+                return;
+            }
+
             PickupableItem targetItem = hit.collider.gameObject.GetComponentInParent<PickupableItem>();
 
             if (targetItem != null)
@@ -274,10 +293,15 @@ public class ItemPlacer : MonoBehaviour
     {
         if (isManipulatingItem) SetManipulationMode(false);
 
-        grabbedRigidbody.useGravity = true;  
-        grabbedRigidbody.linearDamping = 0f;  
-        grabbedRigidbody.linearVelocity = Vector3.zero; 
-        grabbedRigidbody.angularVelocity = Vector3.zero;
+        // isKinematicでない場合のみ重力を戻し、速度をリセットする
+        if (!grabbedRigidbody.isKinematic)
+        {
+            grabbedRigidbody.useGravity = true;  
+            grabbedRigidbody.linearDamping = 0f;  
+            grabbedRigidbody.linearVelocity = Vector3.zero; 
+            grabbedRigidbody.angularVelocity = Vector3.zero;
+        }
+
         grabbedRigidbody = null;
         grabbedOrientation = null;
         manualPositionOffset = Vector3.zero;

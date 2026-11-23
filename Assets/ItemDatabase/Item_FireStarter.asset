@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfe9a2e86c2ef934baa11240e64b7f49, type: 3}
+  m_Name: Item_FireStarter
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: "\u30D5\u30A4\u30A2\u30B9\u30BF\u30FC\u30BF\u30FC\u30A1"
+  itemIcon: {fileID: 0}
+  itemPrefab: {fileID: 8450076799527181193, guid: 06ff54eaa3e9bd54bbcef13b3e1e9b7e, type: 3}
+  defaultSpawnRotation: {x: 0, y: 0, z: 0}
+  itemDescription: 
+  odorRadius: 0
+  isEdible: 0
+  isFuel: 0

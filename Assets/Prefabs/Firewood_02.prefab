@@ -85,6 +85,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a0151a84f227df42bc80184ca5b8e4e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2592282446268438181}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6a0151a84f227df42bc80184ca5b8e4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 405181764230468126}
   m_SourcePrefab: {fileID: 100100000, guid: 6a0151a84f227df42bc80184ca5b8e4e, type: 3}
 --- !u!1 &3955711340799413929 stripped
 GameObject:
@@ -98,7 +101,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3955711340799413929}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 81ca965f5586fc341905b562a2d0a7e8, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -152,3 +155,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupableItem
   itemData: {fileID: 11400000, guid: 6ac9fda344919b7408d00538da29086f, type: 2}
+--- !u!114 &405181764230468126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3955711340799413929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbdc46ede7395e74692573f76e7f8904, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BurnableWood
+  totalBurnTime: 60
+  charredColor: {r: 0.08, g: 0.08, b: 0.08, a: 1}
+  emberEmissionColor: {r: 0.6, g: 0.15, b: 0.02, a: 1}
+  woodLengthAxis: 0
+  thicknessShrinkStart: 0.15
+  lengthShrinkStart: 0.75
+  burningLinearDamping: 3
+  burningAngularDamping: 3
